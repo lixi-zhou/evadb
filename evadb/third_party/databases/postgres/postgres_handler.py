@@ -169,6 +169,7 @@ class PostgresHandler(DBHandler):
             "character varying": str,
             "text": str,
             "boolean": bool,
+            "ARRAY": np.ndarray
             # Add more mappings as needed
         }
 

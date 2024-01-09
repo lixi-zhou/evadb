@@ -92,10 +92,17 @@ def _deserialize_sql_row(sql_row: tuple, columns: List[ColumnCatalogEntry]):
     dict_row = {}
     for idx, col in enumerate(columns):
         # hack, we skip deserializing if sql_row[col.name] is not of type bytes
-        if col.type == ColumnType.NDARRAY and isinstance(sql_row[col.name], bytes):
-            dict_row[col.name] = PickleSerializer.deserialize(sql_row[idx])
-        else:
+        try:
+            if col.type == ColumnType.NDARRAY and isinstance(sql_row[col.name], bytes):
+                dict_row[col.name] = PickleSerializer.deserialize(sql_row[idx])
+            else:
+                dict_row[col.name] = sql_row[idx]
+        except Exception as e:
+            # FIXME temporary fix to support ARRAY in Postgres
+            # err_msg = f"Array parsing error, temp fix"
+            # logger.exception(err_msg)
             dict_row[col.name] = sql_row[idx]
+            # raise Exception(err_msg)
     return dict_row
 
 
